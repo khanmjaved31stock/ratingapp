@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: Arial, Helvetica, sans-serif;
+  --color-ink: #17221d;
+  --color-forest: #174d3a;
+  --color-mint: #d8eee3;
+  --color-paper: #f6f7f3;
+}
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #f6f7f3;
+  color: #17221d;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+:root[data-theme="dark"] body {
+  background: #101815;
+  color: #e7eee9;
+}
+
+:root[data-theme="dark"] .bg-paper {
+  background-color: #101815;
+}
+
+:root[data-theme="dark"] .bg-white,
+:root[data-theme="dark"] .bg-white\/85 {
+  background-color: #19231e;
+}
+
+:root[data-theme="dark"] .bg-slate-50 {
+  background-color: #202c26;
+}
+
+:root[data-theme="dark"] .text-ink,
+:root[data-theme="dark"] .text-slate-800,
+:root[data-theme="dark"] .text-slate-700,
+:root[data-theme="dark"] .text-slate-600 {
+  color: #d7e1da;
+}
+
+:root[data-theme="dark"] .text-slate-500,
+:root[data-theme="dark"] .text-slate-400 {
+  color: #9eafa4;
+}
+
+:root[data-theme="dark"] .border-slate-200,
+:root[data-theme="dark"] .border-slate-300,
+:root[data-theme="dark"] .border-white\/60 {
+  border-color: #34443a;
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] select {
+  background-color: #19231e;
+  color: #e7eee9;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid #73bd96;
+  outline-offset: 3px;
+}
+
+::selection {
+  background: #d8eee3;
+  color: #174d3a;
+}
+@keyframes ratewell-marquee {
+  from { transform: translateX(100vw); }
+  to { transform: translateX(-100%); }
+}
+
+.animate-ratewell-marquee {
+  animation: ratewell-marquee 24s linear infinite;
+}
+
+.animate-ratewell-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ratewell-marquee {
+    animation: none;
+    white-space: normal;
+    width: auto;
+  }
+}
