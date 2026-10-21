@@ -71,7 +71,7 @@ console.log(`API smoke test  base=${baseUrl}  insecure=${insecure}`);
 console.log("");
 
 await check("GET /", 200, () => get("/"));
-await check("GET /api/terms", 200, async (ctx) => {
+await check("GET /api/terms", 200, async () => {
   const result = await get("/api/terms");
   const data = await result.response.json().catch(() => ({}));
   return { ...result, note: `version=${data.version || data.termsVersion || "?"}` };
