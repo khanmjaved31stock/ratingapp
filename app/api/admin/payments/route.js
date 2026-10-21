@@ -25,6 +25,9 @@ import { getPackageExpiryDate } from "@/lib/package-dates";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+void PaymentAccount;
+void RegistrationPackage;
+
 export async function GET(request) {
   try {
     const auth = await requireStaff(request, ["superAdmin", "helpAdmin"]);
