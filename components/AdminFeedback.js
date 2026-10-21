@@ -117,13 +117,13 @@ export default function AdminFeedback({ initialPage, initialTaskPage }) {
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
       <div className="mb-8">
-        <h2 className="text-xl font-semibold">Pending task reward reviews</h2>
+        <h2 className="text-xl font-semibold">Task reward reviews (optional)</h2>
         <p className="mt-1 text-sm leading-6 text-slate-600">
-          Rewards are not withdrawable until a staff member approves the submitted task.
+          Task rewards are credited to users automatically when they complete a task. No approval is required. Use this queue only if you need to manually review or reject a submission retroactively.
         </p>
         {taskRatings.length === 0 ? (
           <p className="mt-4 rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-500">
-            No task submissions are awaiting review.
+            No task submissions are awaiting review. Rewards are auto-credited, so this queue stays empty.
           </p>
         ) : (
           <div className="mt-4 space-y-4">

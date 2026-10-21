@@ -201,7 +201,7 @@ export function UserWallet() {
         <section id="withdrawals" className={`${card} mb-6`}>
           <p className="text-sm font-medium text-slate-500">Available balance</p>
           <p className="mt-2 text-4xl font-semibold text-forest">{money(data.balanceMinor)}</p>
-          <p className="mt-2 text-sm text-amber-800">Pending task rewards: {money(data.pendingTaskRewardsMinor)} · credited only after staff approval</p>
+          <p className="mt-2 text-sm text-emerald-800">Task rewards are credited automatically to your balance the moment you complete a task. No approval is required.</p>
           <p className="mt-3 text-sm text-slate-500">Withdrawal limits: {money(data.minimumWithdrawalMinor)} minimum · {data.maximumWithdrawalMinor === null ? "No package maximum" : `${money(data.maximumWithdrawalMinor)} maximum`}</p>
           <p className="mt-1 text-sm text-slate-500">Payout account: {data.payoutProfile ? `${data.payoutProfile.provider} · ${data.payoutProfile.accountTitle}` : "Not configured"}</p>
           {data.payoutProfile && <span className="mt-2 inline-flex rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-800">Estimated processing: {["usdtBep20", "usdtTrc20"].includes(data.payoutProfile.provider) ? "30–60 minutes" : "5–15 minutes"}</span>}

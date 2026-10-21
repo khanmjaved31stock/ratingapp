@@ -237,7 +237,7 @@ export default function UserDashboard({
         <section id="analytics" className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {[
             ["Withdrawable balance", money(walletSummary?.balanceMinor)],
-            ["Pending task rewards", money(walletSummary?.pendingTaskRewardsMinor)],
+            ["Auto-credited rewards", money(walletSummary?.taskEarningsMinor)],
             ["Deposit Wallet", money(walletSummary?.depositBalanceMinor)],
             ["Lifetime task earnings", money(walletSummary?.taskEarningsMinor)],
             ["Direct referral rewards", money(walletSummary?.directReferralEarningsMinor)],
@@ -257,7 +257,7 @@ export default function UserDashboard({
           </article>
           <article className="rounded-2xl border border-slate-200 bg-white p-5">
             <h2 className="font-semibold">Today’s task progress</h2>
-            {task ? <><p className="mt-2 text-lg font-bold text-forest">{task.dailyCount}{task.dailyLimit ? ` / ${task.dailyLimit}` : ""} submitted</p><p className="mt-1 text-sm text-slate-600">{money(walletSummary?.dailyCollectedMinor)} approved rewards earned today</p></> : <p className="mt-2 text-sm text-slate-500">Task availability is loading.</p>}
+            {task ? <><p className="mt-2 text-lg font-bold text-forest">{task.dailyCount}{task.dailyLimit ? ` / ${task.dailyLimit}` : ""} submitted</p><p className="mt-1 text-sm text-slate-600">{money(walletSummary?.dailyCollectedMinor)} auto-credited to your wallet today</p></> : <p className="mt-2 text-sm text-slate-500">Task availability is loading.</p>}
           </article>
         </section>
         <section className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
