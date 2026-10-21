@@ -1,0 +1,91 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    name: Verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+  deploy:
+    name: Deploy to production server
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          command_timeout: 12m
+          script: |
+            set -e
+            cd /var/www/ratewell/Rating-earning
+
+            echo "== Pulling latest code =="
+            git fetch --all --prune
+            git reset --hard origin/main
+            git clean -fd -e .env.local
+
+            echo "== Installing dependencies =="
+            npm ci
+
+            echo "== Building =="
+            npm run build
+
+            echo "== Restarting app =="
+            pm2 restart ratewell --update-env
+            pm2 save --force
+
+            echo "== Health check =="
+            sleep 5
+            for i in 1 2 3 4 5; do
+              code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 http://127.0.0.1:3000/api/terms || true)
+              if [ "$code" = "200" ]; then
+                echo "Health check OK (HTTP $code)"
+                exit 0
+              fi
+              echo "Attempt $i: HTTP $code, retrying..."
+              sleep 5
+            done
+            echo "Health check failed"
+            pm2 logs ratewell --nostream --lines 40 || true
+            exit 1
