@@ -176,7 +176,7 @@ export default function UserDashboard({
       setEvidenceUrl("");
       setEvidenceImage(null);
       form.reset();
-      setMessage("Your rating was submitted for staff review. Any task reward is pending approval.");
+      setMessage("Your rating was submitted and the task reward was credited to your wallet.");
       await startReviewTask();
       router.refresh();
     } catch {

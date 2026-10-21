@@ -5,6 +5,8 @@ import { isSameOriginRequest, readJsonBody } from "@/lib/request";
 import { getRatingPage, isValidRatingCursor, serializeRating } from "@/lib/rating-data";
 import PortalSettings from "@/models/PortalSettings";
 import WalletTransaction from "@/models/WalletTransaction";
+import WalletBalance from "@/models/WalletBalance";
+import { getWalletBalanceSnapshot } from "@/lib/wallet-ledger";
 import TrafficEvent from "@/models/TrafficEvent";
 import { consumeRateLimit } from "@/lib/rate-limit";
 import User from "@/models/User";
@@ -382,7 +384,7 @@ export async function POST(request) {
               evidenceImagePublicId: uploaded?.publicId || "",
               taskDurationSeconds: transactionTaskDuration,
               taskRewardMinor: reward,
-              moderationStatus: "underReview",
+              moderationStatus: "visible",
             },
           ],
           { session },
@@ -397,8 +399,10 @@ export async function POST(request) {
           },
           {
             $set: {
-              status: "submitted",
+              status: "approved",
               submittedAt,
+              reviewedAt: submittedAt,
+              completedAt: submittedAt,
               ratingId: created._id,
             },
           },
@@ -408,6 +412,38 @@ export async function POST(request) {
           const error = new Error("This task was already completed or has expired.");
           error.statusCode = 409;
           throw error;
+        }
+        if (reward > 0) {
+          const balance = await WalletBalance.findOneAndUpdate(
+            {
+              userId: auth.user._id,
+              balanceMinor: { $lte: Number.MAX_SAFE_INTEGER - reward },
+            },
+            {
+              $inc: { balanceMinor: reward },
+              $setOnInsert: { currency: "PKR" },
+            },
+            { upsert: true, new: true, session },
+          );
+          await WalletTransaction.create(
+            [
+              {
+                userId: auth.user._id,
+                type: "ratingReward",
+                direction: "credit",
+                amountMinor: reward,
+                currency: "PKR",
+                businessDate: day,
+                status: "completed",
+                referenceId: created._id,
+                idempotencyKey: `rating:${created._id.toString()}`,
+                description: `Reward for rating ${targetName}`,
+                createdBy: auth.user._id,
+                ...getWalletBalanceSnapshot(balance, "earning", "credit", reward),
+              },
+            ],
+            { session },
+          );
         }
         const userUpdate = await User.updateOne(
           {
@@ -442,8 +478,10 @@ export async function POST(request) {
           {
             userId: auth.user._id,
             type: "task",
-            title: "Review submitted for approval",
-            message: "Your review is awaiting staff review. Any task reward will be credited after approval.",
+            title: reward > 0 ? "Task completed" : "Review submitted",
+            message: reward > 0
+              ? `${reward} paisa was credited to your wallet for completing the review task.`
+              : "Your review was submitted successfully.",
           },
           session,
         );
